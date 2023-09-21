@@ -13,8 +13,23 @@ void TCPServer::HandleAccept(TCPConnection::pointer newConnection, const boost::
 {
     if (!error)
     {
-        newConnection->Start();
+        _connections.push_back(newConnection);
+        newConnection->Start([this, newConnection](const std::string& msg)
+        {
+            Broadcast(msg, newConnection);
+        });
     }
 
     StartAccept();
+}
+
+void TCPServer::Broadcast(const std::string& msg, TCPConnection::pointer sender)
+{
+    for(auto& connection : _connections)
+    {
+        if (connection != sender)
+        {
+            connection->Write(msg);
+        }
+    }
 }

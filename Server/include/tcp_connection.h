@@ -14,7 +14,8 @@ public:
     using pointer = std::shared_ptr<TCPConnection>;
     static pointer Create(io_service& io);
     tcp::socket& Socket();
-    void Start();
+    using MessageReceivedCallback = std::function<void(const std::string&)>;
+    void Start(MessageReceivedCallback callback);
     void Read();
     void Write(const std::string& msg);
 
@@ -25,4 +26,5 @@ private:
     enum {max_size = 1024};
     char _data[max_size];
     tcp::socket _socket;
+    MessageReceivedCallback _callback;
 };

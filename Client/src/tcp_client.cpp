@@ -58,7 +58,7 @@ void TCPClient::HandleRead(const boost::system::error_code& error, size_t bytes_
 {
     if (!error)
     {
-        std::cout << "Received message: " << std::string(_data, bytes_transferred) << std::endl;
+        std::cout << std::string(_data, bytes_transferred) << std::endl;
         Read();
     }
     else if (error == boost::asio::error::eof)

@@ -13,10 +13,12 @@ class TCPServer
 {
 public:
     TCPServer(io_service& io, int port) : _io(io), _acceptor(io, tcp::endpoint(tcp::v4(), port)) { StartAccept(); }
+    void Broadcast(const std::string& msg, TCPConnection::pointer sender = nullptr);
 
 private:
     void StartAccept();
     void HandleAccept(TCPConnection::pointer newConnection, const boost::system::error_code& error);
     io_service& _io;
     tcp::acceptor _acceptor;
+    std::vector<TCPConnection::pointer> _connections;
 };

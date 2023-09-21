@@ -10,13 +10,15 @@ tcp::socket& TCPConnection::Socket()
     return _socket;
 }
 
-void TCPConnection::Start()
+void TCPConnection::Start(MessageReceivedCallback callback)
 {
+    _callback = callback;
     Read();
 }
 
 void TCPConnection::Read()
 {
+    std::fill(_data, _data + max_size, 0);
     auto self(shared_from_this());
     _socket.async_read_some(
         buffer(_data, max_size),
@@ -37,9 +39,10 @@ void TCPConnection::Write(const std::string& msg)
 
 void TCPConnection::HandleRead(const boost::system::error_code& error, size_t bytes_transferred)
 {
-    if (!error)
+    if (!error && bytes_transferred > 0)
     {
-        std::cout << "Receive message: " << std::string(_data, bytes_transferred) << std::endl;
+        std::string msg(_data, bytes_transferred);
+        _callback(msg);
         Read();
     }
     else if (error == boost::asio::error::eof)
